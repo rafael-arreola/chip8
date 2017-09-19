@@ -66,7 +66,7 @@ func (cpu *CPU) Load(src string) {
 		panic("The ROM exceeds the maximum memory size")
 	}
 	fmt.Printf("%d bytes readed..\n", b_rom)
-	copy(cpu.rom[0x200:(0x200+b_rom)], rom)
+	copy(cpu.ROM[0x200:(0x200+b_rom)], rom)
 }
 
 /*
