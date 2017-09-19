@@ -4,13 +4,13 @@ import (
 	"fmt"
 	// "github.com/veandco/go-sdl2/sdl"
 	"github.com/rafael-arreola/chip8/cpu"
-	"os"
 )
 
 func main() {
-	mustQuit := false
+	//mustQuit := false
 
-	machine := cpu.New()
+	pc := cpu.New()
+	pc.Load("roms/rom")
 	/*
 		init_machine(&cpu)
 		init_machine_rom(&cpu)

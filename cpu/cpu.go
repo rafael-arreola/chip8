@@ -7,7 +7,30 @@ import (
 
 const MEMSIZ = 4096
 
-// CPU represents a CHIP-8 CPU.
+/*
+	+---------------+= 0xFFF (4095) End of Chip-8 RAM
+	|               |
+	|               |
+	|               |
+	|               |
+	|               |
+	| 0x200 to 0xFFF|
+	|     Chip-8    |
+	| Program / Data|
+	|     Space     |
+	|               |
+	|               |
+	|               |
+	+- - - - - - - -+= 0x600 (1536) Start of ETI 660 Chip-8 programs
+	|               |
+	|               |
+	|               |
+	+---------------+= 0x200 (512) Start of most Chip-8 programs
+	| 0x000 to 0x1FF|
+	| Reserved for  |
+	|  interpreter  |
+	+---------------+= 0x000 (0) Start of Chip-8 RAM
+*/
 type CPU struct {
 	ROM    [MEMSIZ]uint8
 	PC     uint16
@@ -23,7 +46,7 @@ func New() CPU {
 	}
 }
 
-func (cpu *CPU) LoadROM(src string) {
+func (cpu *CPU) Load(src string) {
 	stream, err := os.Open(src)
 	if err != nil {
 		panic(err)
@@ -46,6 +69,8 @@ func (cpu *CPU) LoadROM(src string) {
 	copy(cpu.rom[0x200:(0x200+b_rom)], rom)
 }
 
+/*
 func (cpu *CPU) DecodeOp() uint16 {
 	return uint16(cpu.rom[cpu.PC])<<8 | uint16(cpu.rom[cpu.PC+1])
 }
+*/
