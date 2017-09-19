@@ -8,15 +8,12 @@ import (
 
 func main() {
 	running := true
-	pc := cpu.New()
+	pc := cṕu.New()
 	pc.Load("roms/rom")
 
 	for running {
 
 		opcode, nnn, n, x, y, kk, i := pc.DecodeOp()
-		pc.Next()
-		// fmt.Printf("opcode: %X, nnn: %X, n: %X, x: %X, y: %X, kk: %X , i: %X \n", opcode, nnn, n, x, y, kk, i)
-		opcode++
 		switch i {
 		case 0x0:
 			switch nnn {
@@ -28,51 +25,96 @@ func main() {
 				fmt.Printf("SYS %X\n", nnn)
 			}
 		case 0x1:
-			pc.JP(nnn)
+			pc.PC = nnn
 		case 0x2:
 			fmt.Printf("CALL %X\n", nnn)
 		case 0x3:
-			pc.SE(x, kk)
+			if pc.V[x] == kk {
+
+			}
 		case 0x4:
-			pc.SNE(x, kk)
+			if pc.V[x] != kk {
+
+			}
 		case 0x5:
-			pc.SEy(x, y)
+			if pc.V[x] == pc.V[y] {
+
+			}
 		case 0x6:
-			pc.LD(x, kk)
+			pc.V[x] = kk
+
 		case 0x7:
-			pc.ADD(x, kk)
+			pc.V[x] = pc.V[x] + kk
+
 		case 0x8:
 			switch n {
 			case 0x0:
-				pc.LDy(x, y)
+				pc.V[x] = pc.V[y]
+
 			case 0x1:
-				pc.OR(x, y)
+				pc.V[x] = pc.V[x] | pc.V[y]
+
 			case 0x2:
-				pc.AND(x, y)
+				pc.V[x] = pc.V[x] & pc.V[y]
+
 			case 0x3:
-				pc.XOR(x, y)
+				pc.V[x] = pc.V[x] ^ pc.V[y]
+
 			case 0x4:
-				pc.ADD(x, y)
+				var cf uint8
+				if (uint16(pc.V[x]) + uint16(pc.V[y])) > uint16(pc.V[x]) {
+					cf = 1
+				}
+				pc.V[0xF] = cf
+				pc.V[x] = uint8((uint16(pc.V[x]) + uint16(pc.V[y])) & 0xFF)
+
 			case 0x5:
-				pc.SUB(x, y)
+				var cf uint8
+				if pc.V[x] > pc.V[y] {
+					cf = 1
+				}
+				pc.V[0xF] = cf
+				pc.V[x] = pc.V[x] - pc.V[y]
+
 			case 0x6:
-				pc.SHR(x, y)
+				var cf uint8
+				if (pc.V[x] & 0x01) == 0x01 {
+					cf = 1
+				}
+				pc.V[0xF] = cf
+				pc.V[x] = pc.V[x] / 2
+
 			case 0x7:
-				pc.SUBN(x, y)
+				var cf uint8
+				if pc.V[y] > pc.V[x] {
+					cf = 1
+				}
+				pc.V[0xF] = cf
+				pc.V[x] = pc.V[y] - pc.V[x]
+
 			case 0xE:
-				pc.SHL(x, y)
+				var cf uint8
+				if (pc.V[x] & 0x80) == 0x80 {
+					cf = 1
+				}
+				pc.V[0xF] = cf
+
+				pc.V[x] = pc.V[x] * 2
 			}
 		case 0x9:
 			switch n {
 			case 0x0:
-				pc.SNE(x, y)
+				if pc.V[x] != pc.V[x] {
+
+				}
 			}
 		case 0xA:
-			fmt.Printf("LD I, %X\n", nnn)
+			pc.I = nnn
+
 		case 0xB:
-			fmt.Printf("JP V[0], %X\n", nnn)
+			pc.PC = nnn + uint16(pc.V[0])
 		case 0xC:
-			fmt.Printf("RND V[%X], byte\n", x, kk)
+			pc.V[x] = kk + randByte()
 		case 0xD:
 			fmt.Printf("DRW V[%X], V%X, %X\n", x, y, n)
 		case 0xE:
@@ -104,6 +146,8 @@ func main() {
 				fmt.Printf("LD V[%X], [I]\n", x)
 			}
 		}
+
+		pc.Next()
 
 	}
 }

@@ -130,10 +130,10 @@ func (cpu *CPU) Next() {
 >	8xy6 - SHR Vx {, Vy}
 >	8xy7 - SUBN Vx, Vy
 >	8xyE - SHL Vx {, Vy}
-	9xy0 - SNE Vx, Vy
-	Annn - LD I, addr
-	Bnnn - JP V0, addr
-	Cxkk - RND Vx, byte
+>	9xy0 - SNE Vx, Vy
+>	Annn - LD I, addr
+>	Bnnn - JP V0, addr
+>	Cxkk - RND Vx, byte
 	Dxyn - DRW Vx, Vy, nibble
 	Ex9E - SKP Vx
 	ExA1 - SKNP Vx
@@ -254,5 +254,15 @@ func (cpu *CPU) SNE(x uint8, y uint8) {
 	if cpu.V[x] != cpu.V[x] {
 		cpu.Next()
 	}
+	cpu.Next()
+}
+
+func (cpu *CPU) LDI(nnn uint16) {
+	cpu.I = nnn
+	cpu.Next()
+}
+
+func (cpu *CPU) JP0(nnn uint16) {
+	cpu.PC = nnn + uint16(cpu.V[0])
 	cpu.Next()
 }
