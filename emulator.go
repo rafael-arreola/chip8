@@ -8,7 +8,7 @@ import (
 
 const MEMSIZ = 4096
 
-type Machine_t struct {
+type CPU struct {
 	ROM    [MEMSIZ]uint8
 	PC     uint16
 	STACK  [16]uint16
@@ -19,13 +19,13 @@ type Machine_t struct {
 
 func main() {
 	mustQuit := false
-	machine := Machine_t{}
+	cpu := CPU{}
 
-	init_machine(&machine)
-	init_machine_rom(&machine)
+	init_machine(&cpu)
+	init_machine_rom(&cpu)
 
 	for !mustQuit {
-		var opcode uint16 = uint16(machine.rom[machine.PC])<<8 | uint16(machine.rom[machine.PC+1])
+		var opcode uint16 = uint16(cpu.rom[cpu.PC])<<8 | uint16(cpu.rom[cpu.PC+1])
 		var nnn uint16 = opcode & 0xFFF
 		var kk uint8 = uint8(opcode & 0xFF)
 		var n uint8 = uint8(opcode & 0xF)
@@ -38,25 +38,25 @@ func main() {
 		fmt.Printf("n: %X \n", n)
 		fmt.Printf("x: %X \n", x)
 		fmt.Printf("y: %X \n", y)
-		fmt.Printf("AH: %X \n", machine.rom[machine.PC])
-		fmt.Printf("AL: %X \n", machine.rom[machine.PC+1])
+		fmt.Printf("AH: %X \n", cpu.rom[cpu.PC])
+		fmt.Printf("AL: %X \n", cpu.rom[cpu.PC+1])
 
 		mustQuit = true
-		if machine.PC+2 == MEMSIZ {
-			machine.PC = 0
+		if cpu.PC+2 == MEMSIZ {
+			cpu.PC = 0
 			mustQuit = true
 		} else {
-			machine.PC += 2
+			cpu.PC += 2
 		}
 
 	}
 }
 
-func init_machine(machine *Machine_t) {
-	machine.PC = 0x200
+func init_machine(cpu *CPU) {
+	cpu.PC = 0x200
 }
 
-func init_machine_rom(machine *Machine_t) {
+func init_machine_rom(cpu *CPU) {
 	stream, err := os.Open("roms/rom")
 	if err != nil {
 		panic(err)
